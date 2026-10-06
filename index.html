@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mecanografía 6° · Textos y signos</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237C3AED'/%3E%3Ctext x='50' y='72' font-size='50' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%23fff'%3E6%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --tinta:#1E1B36; --gris:#7A8AA0; --verde:#0E9F6E;
+  --rojo:#E11D48; --cursor:#7C3AED; --linea:#E2DDF2;
+}
+html,body{height:100%}
+body{
+  font-family:"Baloo 2",system-ui,sans-serif;
+  background:#F6F4FC;color:var(--tinta);
+  display:flex;flex-direction:column;
+  min-height:100vh;overflow:hidden;
+}
+
+/* ---------------- barra ---------------- */
+.barra{display:flex;align-items:center;gap:10px;padding:9px 20px;border-bottom:2px solid var(--linea);background:#fff;flex-wrap:wrap}
+.marca{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.marca span{background:var(--cursor);color:#fff;width:27px;height:27px;border-radius:8px;display:grid;place-items:center;font-size:.9rem}
+.so{font-size:.82rem;font-weight:700;padding:5px 12px;border-radius:99px;background:#EFE9FE;color:#5B21B6;border:2px solid #DDD1FB;cursor:pointer;white-space:nowrap}
+.so:hover{background:#E4DAFD}
+.niveles{display:flex;gap:5px;background:#F1EFFA;border:2px solid var(--linea);border-radius:12px;padding:4px}
+.niv{padding:5px 12px;border:none;background:transparent;border-radius:8px;font-size:.85rem;font-weight:700;color:var(--gris);font-family:inherit;cursor:pointer}
+.niv:hover{background:#E7E2F7}
+.niv.on{background:var(--cursor);color:#fff;box-shadow:0 2px 6px rgba(124,58,237,.35)}
+.contador{font-size:.9rem;color:var(--gris);font-weight:600;margin-left:auto;white-space:nowrap}
+.contador b{color:var(--tinta);font-size:1.1rem}
+
+/* ---------------- hud ---------------- */
+.hud{display:flex;align-items:center;gap:8px;padding:7px 20px;background:#fff;border-bottom:2px solid var(--linea);flex-wrap:wrap}
+.chip{display:flex;align-items:baseline;gap:6px;font-size:.74rem;font-weight:700;color:var(--gris);background:#F3F0FC;border:2px solid var(--linea);padding:3px 11px;border-radius:10px;white-space:nowrap}
+.chip b{font-size:1.12rem;color:var(--tinta);font-weight:800}
+.chip .u{text-transform:uppercase;letter-spacing:.05em}
+.chip.on{background:#FEF3C7;border-color:#F59E0B;color:#92400E}
+.chip.on b{color:#92400E}
+.hud .flex{flex:1 1 auto}
+.hud button{padding:7px 13px;font-size:.85rem}
+
+.progreso{height:7px;background:var(--linea);flex:0 0 auto}
+.progreso i{display:block;height:100%;background:var(--verde);width:0;transition:width .3s ease}
+
+/* ---------------- escena ---------------- */
+.escena{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px 10px;min-height:0;overflow:auto}
+.caption{font-size:.95rem;color:var(--gris);font-weight:700;text-align:center}
+.direccion{
+  font-size:clamp(1.7rem,5vw,4.4rem);font-weight:800;line-height:1.22;
+  text-align:center;max-width:min(46ch,96vw);
+  display:flex;flex-wrap:wrap;justify-content:center;row-gap:.1em;
+  transition:filter .2s;
+}
+.pal{display:flex}
+.direccion.larga{font-size:clamp(1.1rem,2.5vw,1.9rem);max-width:min(54ch,96vw);line-height:1.5}
+.direccion.parrafo{font-size:clamp(.98rem,1.95vw,1.4rem);max-width:min(60ch,96vw);line-height:1.65}
+.car{position:relative;display:block;transition:color .12s,background .12s,transform .12s}
+.car.pend{color:#C9C2E4}
+.car.ok{color:var(--verde)}
+.car.mal{color:var(--rojo)}
+.car.actual:not(.mal)::after{content:"";position:absolute;left:0;right:0;bottom:.02em;height:.09em;background:var(--cursor);border-radius:3px;animation:latir 1s ease-in-out infinite}
+@keyframes latir{0%,100%{opacity:1}50%{opacity:.3}}
+.car.error{background:#FFE4E6;border-radius:8px;transform:translateY(-4px) scale(1.06)}
+.marcador{min-height:1.4em;font-size:clamp(1.2rem,3vw,2.1rem);font-weight:800;color:var(--verde);opacity:0;transition:opacity .16s}
+.marcador.visible{opacity:1}
+.marcador.fallo{color:var(--rojo)}
+
+/* ---------------- teclado físico ---------------- */
+.marco{
+  margin:2px auto 0;padding:clamp(6px,1.1vw,14px);
+  width:min(1080px,98vw);
+  background:linear-gradient(180deg,#3A2F5E,#241C3F);
+  border-radius:16px;
+  box-shadow:0 8px 22px rgba(30,27,54,.3),inset 0 1px 0 rgba(255,255,255,.14);
+}
+#teclado{display:flex;flex-direction:column;gap:clamp(3px,.42vw,6px)}
+#teclado.oculto{display:none}
+.fila{display:flex;gap:clamp(3px,.42vw,6px)}
+.r0{padding-inline:0}
+.r1{padding-inline:1.6%}
+.r2{padding-inline:3.6%}
+.r3{padding-inline:5.4%}
+.r4{padding-inline:2.4%}
+
+.k{
+  flex:1 1 0;min-width:0;
+  height:clamp(30px,4.3vw,58px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  background:linear-gradient(180deg,#FFFFFF,#EAE6F7);
+  border:1px solid #CFC6EA;border-bottom:4px solid #AFA3D2;
+  border-radius:9px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:clamp(.72rem,1.45vw,1.32rem);font-weight:700;color:#37305A;
+  white-space:nowrap;line-height:1.05;
+  box-shadow:0 2px 3px rgba(30,27,54,.12);
+  transition:transform .07s,background .12s,color .12s,border-color .12s;
+}
+.k .s{font-size:.6em;opacity:.55;font-weight:700}
+.k .i{font-size:1.05em}
+.k .globo{width:clamp(.72rem,1.35vw,1.2rem);height:clamp(.72rem,1.35vw,1.2rem);fill:currentColor;opacity:.82;flex:0 0 auto}
+.k.txt{font-size:clamp(.5rem,.85vw,.72rem);color:#8479B0;font-family:inherit;font-weight:700}
+.k.pulsada{
+  transform:translateY(3px);border-bottom-width:1px;color:#fff;
+  background:linear-gradient(180deg,#34D399,#059669);border-color:#059669;
+  box-shadow:0 0 16px rgba(16,185,129,.5);
+}
+.k.siguiente{
+  background:linear-gradient(180deg,#EDE4FE,#DDD0FD);
+  border-color:var(--cursor);color:#5B21B6;
+  box-shadow:0 0 16px rgba(124,58,237,.5);
+}
+.k.shift-encendido{
+  background:linear-gradient(180deg,#FDE68A,#F59E0B);border-color:#D97706;color:#7C2D12;
+  transform:translateY(2px);box-shadow:0 0 18px rgba(245,158,11,.55);
+}
+
+/* ---------------- pie ---------------- */
+.pie{display:flex;gap:10px;align-items:center;justify-content:center;padding:9px 20px 5px;flex-wrap:wrap}
+button{font-family:inherit;font-size:.95rem;font-weight:600;padding:9px 16px;border-radius:10px;border:2px solid var(--linea);background:#fff;color:var(--tinta);cursor:pointer;transition:transform .1s,background .15s,border-color .15s}
+button:hover{background:#F0EBFD;border-color:#CFC6EA}
+button:active{transform:translateY(2px)}
+button.primario{background:var(--cursor);border-color:var(--cursor);color:#fff}
+button.primario:hover{background:#6D28D9}
+.nota{font-size:.8rem;color:var(--gris);font-weight:600;text-align:center;padding:0 20px 9px}
+kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-radius:5px;padding:1px 6px;font-family:inherit;font-weight:700;font-size:.85em}
+.sin-ver .direccion{filter:blur(18px)}
+.sin-ver .direccion:hover{filter:blur(9px)}
+
+/* ---------------- resumen ---------------- */
+.resumen{position:fixed;inset:0;background:rgba(30,27,54,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:60;padding:20px}
+.resumen.on{display:grid}
+.tarjeta{background:#fff;border-radius:20px;padding:26px 30px;width:min(580px,95vw);text-align:center;box-shadow:0 26px 60px rgba(0,0,0,.4);border-top:9px solid var(--cursor)}
+.tarjeta h2{font-size:1.65rem;line-height:1.15}
+.tarjeta .sub{color:var(--gris);font-weight:600;font-size:.9rem;margin-top:4px;margin-bottom:16px}
+.grilla{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
+.dato{background:#F3F0FC;border:2px solid var(--linea);border-radius:13px;padding:11px 5px}
+.dato b{display:block;font-size:1.5rem;line-height:1.15}
+.dato span{font-size:.7rem;color:var(--gris);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.pieBot{display:flex;gap:10px;justify-content:center}
+
+@media (max-height:820px){
+  .direccion{font-size:clamp(1.4rem,3.6vw,2.9rem)}
+  .direccion.larga{font-size:clamp(1rem,2.1vw,1.5rem)}
+  .direccion.parrafo{font-size:clamp(.9rem,1.7vw,1.18rem)}
+  .k{height:clamp(26px,3.4vw,42px);font-size:clamp(.62rem,1.05vw,.95rem);border-bottom-width:3px}
+  .escena{gap:8px;padding:6px 10px}
+}
+@media (max-height:640px){.nota{display:none}}
+@media (max-width:700px){.direccion{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <div class="marca"><span>6</span> Mecanografía 6°</div>
+  <div class="so" id="so" title="Toca para cambiar entre Windows y Mac">Teclado: Windows</div>
+  <div class="niveles" id="niveles">
+    <button class="niv on" data-n="0">Frases</button>
+    <button class="niv" data-n="1">Con signos</button>
+    <button class="niv" data-n="2">Párrafos</button>
+  </div>
+  <div class="contador"><span id="pref">Texto</span> <b id="cual">1</b> <span id="de">de 10</span> · errores <b id="errores">0</b></div>
+</div>
+
+<div class="hud">
+  <div class="chip"><b id="cPPM">0</b><span class="u">PPM</span></div>
+  <div class="chip"><b id="cPrec">100%</b><span class="u">precisión</span></div>
+  <div class="chip" id="chRacha"><b id="cRacha">0</b><span class="u">racha</span></div>
+  <div class="chip"><b id="cReloj">0:00</b><span class="u" id="uReloj">tiempo</span></div>
+  <div class="flex"></div>
+  <button id="btnOcultar">Ocultar texto</button>
+  <button id="btnTeclado">Ocultar teclado</button>
+  <button id="btnPantalla">Pantalla completa</button>
+  <button id="btnReiniciar">Reiniciar</button>
+</div>
+
+<div class="progreso"><i id="barra"></i></div>
+
+<div class="escena">
+  <div class="caption" id="caption">Escribe la frase con acentos y mayúsculas</div>
+  <div class="direccion" id="linea"></div>
+  <div class="marcador" id="marcador"></div>
+</div>
+
+<div class="marco">
+  <div id="teclado"></div>
+</div>
+
+<div class="pie">
+  <button class="primario" id="btnOtra">Otro texto</button>
+  <button id="btnReloj">⏱ Contrarreloj: 60 s</button>
+</div>
+
+<div class="nota">
+  El <b>PPM</b> cuenta palabras por minuto y la <b>precisión</b> es lo que escribiste bien sobre lo que intentaste ·
+  <kbd>Enter</kbd> pasa de texto · <kbd>⌫</kbd> borra
+</div>
+
+<div class="resumen" id="resumen">
+  <div class="tarjeta">
+    <h2 id="rTit">¡Ronda completada!</h2>
+    <p class="sub" id="rSub">Así te fue en esta ronda</p>
+    <div class="grilla">
+      <div class="dato"><b id="rTextos">0</b><span>textos</span></div>
+      <div class="dato"><b id="rErr">0</b><span>errores</span></div>
+      <div class="dato"><b id="rPrec">100%</b><span>precisión</span></div>
+      <div class="dato"><b id="rRacha">0</b><span>racha máx</span></div>
+      <div class="dato"><b id="rPPM">0</b><span>PPM</span></div>
+      <div class="dato"><b id="rTiempo">0:00</b><span>tiempo</span></div>
+    </div>
+    <div class="pieBot">
+      <button class="primario" id="rOtra">Otra vez</button>
+      <button id="rCerrar">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+/* ==========================================================
+   1. Textos — 3 niveles de dificultad creciente
+   ========================================================== */
+const FRASES = [
+  "El equipo de robótica ganó la competencia estatal.",
+  "Mi abuela guarda recetas antiguas en un cuaderno.",
+  "Mañana visitaremos el museo de historia de la ciudad.",
+  "La maestra explicó la lección con paciencia y ejemplos.",
+  "Nuestro grupo plantó árboles en el patio de la escuela.",
+  "Después del recreo volvimos a la biblioteca a leer.",
+  "El tren salió puntual hacia la costa de Veracruz.",
+  "Preparé un dibujo para la feria de ciencias del aula.",
+  "Los voluntarios limpiaron el parque el sábado temprano.",
+  "En la clase de español leímos un cuento muy gracioso.",
+  "Mi perro se llama Tonto y duerme debajo de la mesa.",
+  "Aprendí a sumar fracciones con la ayuda de mis amigos."
+];
+
+const SIGNOS = [
+  "La biblioteca abre de 8:00 a 18:30, de lunes a viernes.",
+  "Descuento del 15 % en cuadernos del 12 al 18 de marzo.",
+  "Escribe 20 líneas y sube el archivo a aula.edu.mx/2026.",
+  "¿Cuántas páginas tiene el libro? Tiene 248, son muchas.",
+  "El promedio del grupo fue 8.7; falta la tarea del viernes.",
+  "Teléfono: 55-1234-5678 (solo de 9:00 a 14:00).",
+  "Respuesta: 45 + 37 = 82, ¿la verificaste con la calculadora?",
+  "El archivo pesa 1.5 MB y se llama 'tarea-6to.txt'.",
+  "Lee el texto de la página 119 y contesta 5 preguntas.",
+  "¿Ya entregaste el reporte? Vence el viernes a las 12:00.",
+  "El 40 % del grupo eligió pintura; el 60 % eligió música.",
+  "Guarda tu trabajo con Ctrl + S antes de cerrar la ventana."
+];
+
+const PARRAFOS = [
+  "En la feria de ciencias medimos la temperatura cada hora durante tres días. El aula más caliente fue la del tercer piso.",
+  "La maestra pidió que investigáramos el origen de las palabras. Usamos el diccionario y escribimos diez definiciones.",
+  "El pasado sábado limpiamos el río con otros grupos. Recogimos catorce costales y aprendimos a separar la basura.",
+  "Nuestro equipo de básquet perdió el primer partido, pero en el siguiente ganó por veinte puntos. Nunca nos rendimos.",
+  "Para la muestra de danza ensayamos todos los días después de clase. La coreografía duró tres minutos y salió muy bien.",
+  "En la biblioteca encontramos un mapa antiguo de la ciudad. Las calles se llamaban distinto y el río cruzaba el centro."
+];
+
+const NIVELES = [
+  { cuantos:10, lista:FRASES,    cls:"",         pie:"Escribe la frase con acentos y mayúsculas" },
+  { cuantos:10, lista:SIGNOS,    cls:"larga",    pie:"Escribe el texto con números y signos" },
+  { cuantos:6,  lista:PARRAFOS,  cls:"parrafo",  pie:"Escribe el párrafo completo, sin saltarte renglones" }
+];
+
+const azar = n => Math.floor(Math.random() * n);
+
+function construirRonda(){
+  const N = NIVELES[nivel];
+  const todas = N.lista.slice();
+  for (let i = todas.length - 1; i > 0; i--){
+    const j = azar(i + 1);
+    const t = todas[i]; todas[i] = todas[j]; todas[j] = t;
+  }
+  return todas.slice(0, N.cuantos);
+}
+
+/* ==========================================================
+   2. Teclado físico: Windows o Mac, layout latino
+   Cada tecla: [carácter normal, carácter con Shift (o null), ancho]
+   ========================================================== */
+const FILA_NUM  = [ ["\\","|"],["1","!"],["2","\""],["3","#"],["4","$"],["5","%"],
+                    ["6","&"],["7","/"],["8","("],["9",")"],["0","="],
+                    ["'","\""],["¿","?"],["⌫",null,1.7] ];
+const FILA_SUP  = [ ["q"],["w"],["e"],["r"],["t"],["y"],
+                    ["u"],["i"],["o"],["p"],["´","¨"],["+","*"],
+                    ["⏎",null,2.2] ];
+const FILA_MED  = [ ["a"],["s"],["d"],["f"],["g"],["h"],
+                    ["j"],["k"],["l"],["ñ"],["'","\""],
+                    ["⏎",null,2.6] ];
+const FILA_INF  = [ ["⇧",null,2.5],["<",">"],["z"],["x"],["c"],["v"],
+                    ["b"],["n"],["m"],[",",";"],[".",":"],["-","_"],
+                    ["⇧",null,2.9] ];
+const FILA_BAJ_MAC = [ ["Ctrl",null,1.4],["⌥",null,1.2],["⌘",null,1.3],
+                    [" ",null,5.6],["⌘",null,1.3],["⌥",null,1.2],
+                    ["Ctrl",null,1.4] ];
+/* "__win__" se dibuja como el logo de Windows (las cuatro ventanitas)
+   la barra espaciadora se indexa con " " para que se ilumine al escribirla */
+const FILA_BAJ_WIN = [ ["Ctrl",null,1.4],["__win__",null,1.1],["Alt",null,1.2],
+                    [" ",null,6.4],["Alt",null,1.2],["__win__",null,1.1],
+                    ["Ctrl",null,1.4] ];
+
+const TECLADOS = {
+  win: {
+    nombre:"Windows",
+    filas:[
+      { c:"r0", k:FILA_NUM },
+      { c:"r1", k:[["⇥",null,1.6]].concat(FILA_SUP) },
+      { c:"r2", k:[["⇪",null,2.1]].concat(FILA_MED) },
+      { c:"r3", k:FILA_INF },
+      { c:"r4", k:FILA_BAJ_WIN }
+    ]
+  },
+  mac: {
+    nombre:"Mac",
+    filas:[
+      { c:"r0", k:FILA_NUM },
+      { c:"r1", k:[["⌃",null,1.6]].concat(FILA_SUP) },
+      { c:"r2", k:[["⌥",null,1.9]].concat(FILA_MED) },
+      { c:"r3", k:FILA_INF },
+      { c:"r4", k:[["fn",null,1.3],["Ctrl",null,1.3],["⌥",null,1.2],["⌘",null,1.3],
+                  [" ",null,5.6],["⌘",null,1.3],["⌥",null,1.2],["Ctrl",null,1.3]] }
+    ]
+  }
+};
+
+/* cada tecla también produce su variante con Shift pulsada */
+const CON_SHIFT = {
+  "\\":"|", "1":"!", "2":"\"", "3":"#", "4":"$", "5":"%",
+  "6":"&", "7":"/", "8":"(", "9":")", "0":"=",
+  "'":"\"", "¿":"?", "´":"¨", "+":"*", "<":">",
+  ",":";", ".":":", "-":"_"
+};
+
+/* El acento es TECLA MUERTA: al pulsarla el navegador no entrega carácter,
+   sino "Dead" (o el acento suelto), y el carácter ya compuesto ("é") llega
+   en la pulsación siguiente. Guardamos el acento y componemos al recibir la vocal. */
+const ACENTOS = "´¨^`~";
+const COMPUESTAS = {
+  "´a":"á","´e":"é","´i":"í","´o":"ó","´u":"ú","´y":"ý",
+  "¨a":"ä","¨e":"ë","¨i":"ï","¨o":"ö","¨u":"ü",
+  "^a":"â","^e":"ê","^i":"î","^o":"ô","^u":"û",
+  "`a":"à","`e":"è","`i":"ì","`o":"ò","`u":"ù",
+  "~a":"ã","~n":"ñ"
+};
+let acentoPendiente = null;
+
+function detectarSO(){
+  const datos = (navigator.userAgentData && navigator.userAgentData.platform) || "";
+  const s = (datos + " " + (navigator.platform || "") + " " + (navigator.userAgent || "")).toLowerCase();
+  return /mac|iphone|ipad|ipod/.test(s) ? "mac" : "win";
+}
+
+let tipoTeclado = detectarSO();
+
+const elTeclado = $("teclado");
+const mapaTeclas = new Map();
+const teclasShift = [];
+
+const PIDE_SHIFT = new Set();
+for (const base in CON_SHIFT) PIDE_SHIFT.add(CON_SHIFT[base]);
+
+function pideShift(ch){
+  return PIDE_SHIFT.has(ch) || /[A-ZÁÉÍÓÚÑÜ]/.test(ch);
+}
+
+function indexar(sub, sup, nodo){
+  const variantes = [sub];
+  if (sup) variantes.push(sup);
+  if (/^[a-záéíóúüñ]$/i.test(sub)) variantes.push(sub.toUpperCase());
+  for (const c of variantes){
+    if (c.length !== 1) continue;
+    if (!mapaTeclas.has(c)) mapaTeclas.set(c, []);
+    mapaTeclas.get(c).push(nodo);
+  }
+}
+
+const LOGO_WIN = '<svg class="globo" viewBox="0 0 12 12" aria-hidden="true">'
+  + '<rect x="0" y="0" width="5" height="5"/><rect x="6.4" y="0" width="5" height="5"/>'
+  + '<rect x="0" y="6.4" width="5" height="5"/><rect x="6.4" y="6.4" width="5" height="5"/></svg>';
+
+function dibujarTeclado(){
+  const t = TECLADOS[tipoTeclado];
+  elTeclado.textContent = "";
+  mapaTeclas.clear();
+  teclasShift.length = 0;
+
+  t.filas.forEach(fila => {
+    const div = document.createElement("div");
+    div.className = "fila " + fila.c;
+    fila.k.forEach(k => {
+      const sub = k[0], sup = k.length > 1 ? k[1] : null, ancho = k[2];
+      const n = document.createElement("div");
+      n.className = "k";
+      if (sub.length > 1 && sub !== "__win__") n.classList.add("txt");
+      n.innerHTML = (sup ? '<span class="s">' + sup + '</span>' : "")
+                  + (sub === "__win__" ? LOGO_WIN : '<span class="i">' + (sub === " " ? "␣" : sub) + '</span>');
+      if (sub === "⇧") teclasShift.push(n);
+      if (ancho) n.style.flexGrow = ancho;
+      div.appendChild(n);
+      if (sub !== "__win__") indexar(sub, sup, n);
+    });
+    elTeclado.appendChild(div);
+  });
+
+  $("so").textContent = "Teclado: " + t.nombre;
+  $("btnTeclado").textContent = "Ocultar teclado";
+  elTeclado.classList.remove("oculto");
+  marcarSiguiente();
+}
+
+function pulsarEnTeclado(caracter){
+  const nodos = mapaTeclas.get(caracter);
+  if (!nodos) return;
+  nodos.forEach(n => {
+    n.classList.add("pulsada");
+    setTimeout(() => n.classList.remove("pulsada"), 190);
+  });
+}
+
+function shiftEncendido(activo){
+  teclasShift.forEach(n => n.classList.toggle("shift-encendido", activo));
+}
+
+function marcarSiguiente(){
+  document.querySelectorAll(".k.siguiente").forEach(n => n.classList.remove("siguiente"));
+  if (bloqueado || pos >= actual.length){ shiftEncendido(false); return; }
+  const nodos = mapaTeclas.get(actual[pos]);
+  if (nodos) nodos.forEach(n => n.classList.add("siguiente"));
+  shiftEncendido(pideShift(actual[pos]));
+}
+
+/* ==========================================================
+   3. Motor de tecleo + estadística
+   ========================================================== */
+let nivel = 0;
+let modo = "textos";            /* "textos" = ronda fija · "reloj" = 60 s */
+const SEG_RELOJ = 60;
+
+let cola = [];
+let indice = 0;
+let actual = "";
+let pos = 0;
+let bloqueado = false;
+let reloj = null;
+
+let errs = 0;                   /* errores tecleados */
+let ok = 0;                     /* caracteres correctos */
+let racha = 0, rachaMax = 0;
+let hechos = 0;                 /* textos completados en la ronda */
+let t0 = 0;                     /* primer golpe de la ronda */
+let tick = null;
+let finRonda = false;
+
+function fmt(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+
+function barridoProgreso(){
+  let p;
+  if (modo === "textos") p = (indice + (actual.length ? pos / actual.length : 0)) / cola.length;
+  else p = t0 ? Math.min(1, (Date.now() - t0) / (SEG_RELOJ * 1000)) : 0;
+  $("barra").style.width = Math.round(p * 100) + "%";
+}
+
+function hud(){
+  $("errores").textContent = errs;
+  $("cRacha").textContent = racha;
+  $("chRacha").classList.toggle("on", racha >= 10);
+
+  const ms = t0 ? Date.now() - t0 : 0;
+  const min = ms / 60000;
+  $("cPPM").textContent = min > 0.0001 ? Math.round(ok / 5 / min) : 0;
+  const total = ok + errs;
+  $("cPrec").textContent = (total ? Math.round(ok / total * 100) : 100) + "%";
+
+  if (modo === "reloj"){
+    const resto = Math.max(0, SEG_RELOJ - ms / 1000);
+    $("cReloj").textContent = fmt(resto * 1000);
+    $("uReloj").textContent = "restante";
+    if (t0 && resto <= 0) terminarRonda();
+  } else {
+    $("cReloj").textContent = fmt(ms);
+    $("uReloj").textContent = "tiempo";
+  }
+  barridoProgreso();
+}
+
+function arrancarReloj(){
+  if (t0 || finRonda) return;
+  t0 = Date.now();
+  tick = setInterval(hud, 250);
+}
+
+function pintar(){
+  const cont = $("linea");
+  cont.textContent = "";
+  const frag = document.createDocumentFragment();
+  let pal = null;
+  for (let i = 0; i < actual.length; i++){
+    const c = actual[i];
+    if (c === " "){
+      if (!pal){ pal = document.createElement("span"); pal.className = "pal"; frag.appendChild(pal); }
+      pal.appendChild(filaChar(i, c));
+      pal = null;
+      continue;
+    }
+    if (!pal){ pal = document.createElement("span"); pal.className = "pal"; frag.appendChild(pal); }
+    pal.appendChild(filaChar(i, c));
+  }
+  cont.appendChild(frag);
+
+  if (modo === "textos"){
+    $("pref").textContent = "Texto";
+    $("cual").textContent = indice + 1;
+    $("de").textContent = "de " + cola.length;
+  } else {
+    $("pref").textContent = "Completados";
+    $("cual").textContent = hechos;
+    $("de").textContent = "";
+  }
+  $("errores").textContent = errs;
+  marcarSiguiente();
+}
+
+function filaChar(i, c){
+  const s = document.createElement("span");
+  s.className = "car";
+  if (i < pos) s.classList.add("ok");
+  else if (i === pos) s.classList.add("actual", "pend");
+  s.textContent = c === " " ? String.fromCharCode(160) : c;
+  s.dataset.i = i;
+  return s;
+}
+
+function avisar(texto, esFallo){
+  const m = $("marcador");
+  m.textContent = texto;
+  m.classList.add("visible");
+  m.classList.toggle("fallo", !!esFallo);
+}
+
+function mostrar(){
+  actual = cola[indice];
+  pos = 0;
+  bloqueado = false;
+  acentoPendiente = null;
+  $("linea").className = "direccion " + NIVELES[nivel].cls;
+  $("caption").textContent = NIVELES[nivel].pie;
+  pintar();
+  hud();
+}
+
+function reiniciar(){
+  clearTimeout(reloj);
+  clearInterval(tick);
+  tick = null; t0 = 0; finRonda = false;
+  errs = 0; ok = 0; racha = 0; rachaMax = 0; hechos = 0;
+  cola = construirRonda();
+  indice = 0;
+  $("resumen").classList.remove("on");
+  $("marcador").classList.remove("visible");
+  mostrar();
+}
+
+function siguienteTexto(){
+  /* en modo "textos" la ronda termina con el último;
+     en modo "reloj" se vuelven a barajar para seguir sin acabarse la lista */
+  if (modo === "textos" && indice + 1 >= cola.length){ terminarRonda(); return; }
+  indice++;
+  if (indice >= cola.length){ cola = construirRonda(); indice = 0; }
+  mostrar();
+}
+
+function terminar(){
+  bloqueado = true;
+  hechos++;
+  pintar();
+  avisar("¡Bien!", false);
+  actual.split("").forEach((c, i) => setTimeout(() => pulsarEnTeclado(c), i * 40));
+  reloj = setTimeout(() => {
+    $("marcador").classList.remove("visible");
+    if (finRonda) return;
+    siguienteTexto();
+  }, 1000);
+}
+
+function terminarRonda(){
+  if (finRonda) return;
+  finRonda = true;
+  bloqueado = true;
+  clearTimeout(reloj);
+  clearInterval(tick);
+  tick = null;
+  if (t0) hud();
+
+  const ms = t0 ? Date.now() - t0 : 0;
+  const total = ok + errs;
+  $("rTit").textContent = modo === "reloj" ? "¡Se acabó el tiempo!" : "¡Ronda completada!";
+  $("rSub").textContent = NIVELES[nivel].cls === "parrafo" ? "Nivel: párrafos"
+    : (NIVELES[nivel].cls === "larga" ? "Nivel: con signos" : "Nivel: frases");
+  $("rTextos").textContent = hechos;
+  $("rErr").textContent = errs;
+  $("rPrec").textContent = (total ? Math.round(ok / total * 100) : 100) + "%";
+  $("rRacha").textContent = rachaMax;
+  $("rPPM").textContent = ms > 0 ? Math.round(ok / 5 / (ms / 60000)) : 0;
+  $("rTiempo").textContent = fmt(ms);
+  $("resumen").classList.add("on");
+}
+
+function saltar(){
+  clearTimeout(reloj);
+  $("marcador").classList.remove("visible");
+  if (finRonda) return;
+  racha = 0;
+  hud();
+  siguienteTexto();
+}
+
+function teclear(ch){
+  if (bloqueado || finRonda) return;
+
+  if (ch === "Enter"){
+    saltar();
+    return;
+  }
+  if (ch === "Backspace"){
+    acentoPendiente = null;
+    if (pos > 0){
+      pos--;
+      const letras = document.querySelectorAll(".car");
+      if (letras[pos]){ letras[pos].classList.remove("ok","error"); letras[pos].classList.add("pend","actual"); }
+      if (letras[pos + 1]){ letras[pos + 1].classList.remove("actual"); letras[pos + 1].classList.add("pend"); }
+      marcarSiguiente();
+      barridoProgreso();
+    }
+    return;
+  }
+  if (ch.length !== 1) return;
+
+  /* Hay un acento pendiente: se compone con esta vocal.
+     - Si el SO ya trajo el carácter compuesto (Option+e → "é"), se usa tal cual.
+     - Si trajo la vocal suelta, se compone aquí con el acento guardado. */
+  if (acentoPendiente !== null){
+    const base = acentoPendiente;
+    acentoPendiente = null;
+    if (base){
+      const vocal = ch.toLowerCase();
+      const compuesta = COMPUESTAS[base + vocal];
+      if (compuesta) ch = (/[A-ZÁÉÍÓÚÑÜ]/.test(ch)) ? compuesta.toUpperCase() : compuesta;
+    }
+  }
+
+  arrancarReloj();
+  pulsarEnTeclado(ch);
+
+  if (ch === actual[pos]){
+    const letras = document.querySelectorAll(".car");
+    if (letras[pos]){ letras[pos].classList.remove("actual","pend"); letras[pos].classList.add("ok"); }
+    ok++;
+    racha++;
+    if (racha > rachaMax) rachaMax = racha;
+    pos++;
+    if (pos >= actual.length){ hud(); terminar(); return; }
+    if (letras[pos]) letras[pos].classList.add("actual","pend");
+    marcarSiguiente();
+    hud();
+  } else {
+    errs++;
+    racha = 0;
+    hud();
+    const letras = document.querySelectorAll(".car");
+    if (letras[pos]) letras[pos].classList.add("error");
+    avisar("Casi", true);
+    setTimeout(() => {
+      const n = document.querySelectorAll(".car")[pos];
+      if (n) n.classList.remove("error");
+      $("marcador").classList.remove("visible");
+    }, 520);
+  }
+}
+
+document.addEventListener("keydown", ev => {
+  /* En Mac, Option+vocal entrega el carácter YA compuesto (é, ñ, ü…). */
+  if (ev.altKey){
+    if (ev.key.length === 1 && acentoPendiente === null) teclear(ev.key);
+    return;
+  }
+  if (ev.ctrlKey || ev.metaKey) return;
+  let k = ev.key;
+
+  /* TECLA MUERTA — se atiende ANTES de preventDefault a propósito:
+     preventDefault cancela la composición nativa de macOS/Windows y el
+     carácter acentuado nunca llegaría. Aquí solo se anota el acento (por ev.code,
+     como respaldo si la plataforma no compone) y se deja actuar al sistema. */
+  if (k === "Dead"){
+    acentoPendiente = (ev.code === "Backquote") ? "¨"
+                    : (ev.code === "Quote") ? "´"
+                    : "";
+    return;
+  }
+  ev.preventDefault();
+
+  /* acento suelto (plataformas que no lo marcan como Dead): se compone aquí */
+  if (k.length === 1 && ACENTOS.includes(k)){
+    acentoPendiente = k;
+    pulsarEnTeclado(k);
+    return;
+  }
+
+  /* algunos navegadores entregan la letra en minúscula aun con Shift:
+     se acepta también la versión en mayúscula */
+  if (ev.shiftKey && k.length === 1) k = k.toUpperCase();
+  if (k === "Shift"){ shiftEncendido(true); return; }
+  teclear(k);
+});
+document.addEventListener("keyup", ev => { if (ev.key === "Shift") shiftEncendido(pideShift(actual[pos])); });
+
+/* ==========================================================
+   4. Botones
+   ========================================================== */
+$("btnOtra").addEventListener("click", saltar);
+$("btnReiniciar").addEventListener("click", reiniciar);
+$("rOtra").addEventListener("click", reiniciar);
+$("rCerrar").addEventListener("click", () => $("resumen").classList.remove("on"));
+
+document.querySelectorAll(".niv").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".niv").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  nivel = Number(b.dataset.n);
+  reiniciar();
+}));
+
+$("btnReloj").addEventListener("click", () => {
+  modo = modo === "textos" ? "reloj" : "textos";
+  $("btnReloj").textContent = modo === "textos" ? "⏱ Contrarreloj: 60 s" : "✔ Modo: por textos";
+  reiniciar();
+});
+
+$("btnOcultar").addEventListener("click", () => {
+  document.body.classList.toggle("sin-ver");
+  $("btnOcultar").textContent = document.body.classList.contains("sin-ver") ? "Ver texto" : "Ocultar texto";
+});
+$("btnTeclado").addEventListener("click", () => {
+  const oculto = elTeclado.classList.toggle("oculto");
+  $("btnTeclado").textContent = oculto ? "Mostrar teclado" : "Ocultar teclado";
+});
+$("so").addEventListener("click", () => {
+  tipoTeclado = tipoTeclado === "win" ? "mac" : "win";
+  dibujarTeclado();
+});
+$("btnPantalla").addEventListener("click", () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen().catch(() => {});
+});
+
+/* ==========================================================
+   5. Arranque
+   ========================================================== */
+dibujarTeclado();
+reiniciar();
+</script>
+</body>
+</html>
