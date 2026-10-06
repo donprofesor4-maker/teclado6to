@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mecanografía 6° · Textos y signos</title>
+<title>Práctica de direcciones · 6°</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237C3AED'/%3E%3Ctext x='50' y='72' font-size='50' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%23fff'%3E6%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,10 +28,6 @@ body{
 .marca span{background:var(--cursor);color:#fff;width:27px;height:27px;border-radius:8px;display:grid;place-items:center;font-size:.9rem}
 .so{font-size:.82rem;font-weight:700;padding:5px 12px;border-radius:99px;background:#EFE9FE;color:#5B21B6;border:2px solid #DDD1FB;cursor:pointer;white-space:nowrap}
 .so:hover{background:#E4DAFD}
-.niveles{display:flex;gap:5px;background:#F1EFFA;border:2px solid var(--linea);border-radius:12px;padding:4px}
-.niv{padding:5px 12px;border:none;background:transparent;border-radius:8px;font-size:.85rem;font-weight:700;color:var(--gris);font-family:inherit;cursor:pointer}
-.niv:hover{background:#E7E2F7}
-.niv.on{background:var(--cursor);color:#fff;box-shadow:0 2px 6px rgba(124,58,237,.35)}
 .contador{font-size:.9rem;color:var(--gris);font-weight:600;margin-left:auto;white-space:nowrap}
 .contador b{color:var(--tinta);font-size:1.1rem}
 
@@ -53,13 +49,12 @@ body{
 .caption{font-size:.95rem;color:var(--gris);font-weight:700;text-align:center}
 .direccion{
   font-size:clamp(1.7rem,5vw,4.4rem);font-weight:800;line-height:1.22;
-  text-align:center;max-width:min(46ch,96vw);
+  text-align:center;max-width:min(34ch,96vw);
   display:flex;flex-wrap:wrap;justify-content:center;row-gap:.1em;
   transition:filter .2s;
 }
-.pal{display:flex}
-.direccion.larga{font-size:clamp(1.1rem,2.5vw,1.9rem);max-width:min(54ch,96vw);line-height:1.5}
-.direccion.parrafo{font-size:clamp(.98rem,1.95vw,1.4rem);max-width:min(60ch,96vw);line-height:1.65}
+.pal{display:flex;flex-wrap:wrap;justify-content:center}
+.direccion.larga{font-size:clamp(1.05rem,2.4vw,1.75rem);max-width:min(44ch,96vw);line-height:1.5}
 .car{position:relative;display:block;transition:color .12s,background .12s,transform .12s}
 .car.pend{color:#C9C2E4}
 .car.ok{color:var(--verde)}
@@ -146,8 +141,7 @@ kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-r
 
 @media (max-height:820px){
   .direccion{font-size:clamp(1.4rem,3.6vw,2.9rem)}
-  .direccion.larga{font-size:clamp(1rem,2.1vw,1.5rem)}
-  .direccion.parrafo{font-size:clamp(.9rem,1.7vw,1.18rem)}
+  .direccion.larga{font-size:clamp(.98rem,2vw,1.4rem)}
   .k{height:clamp(26px,3.4vw,42px);font-size:clamp(.62rem,1.05vw,.95rem);border-bottom-width:3px}
   .escena{gap:8px;padding:6px 10px}
 }
@@ -158,14 +152,9 @@ kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-r
 <body>
 
 <div class="barra">
-  <div class="marca"><span>6</span> Mecanografía 6°</div>
+  <div class="marca"><span>6</span> Práctica de direcciones</div>
   <div class="so" id="so" title="Toca para cambiar entre Windows y Mac">Teclado: Windows</div>
-  <div class="niveles" id="niveles">
-    <button class="niv on" data-n="0">Frases</button>
-    <button class="niv" data-n="1">Con signos</button>
-    <button class="niv" data-n="2">Párrafos</button>
-  </div>
-  <div class="contador"><span id="pref">Texto</span> <b id="cual">1</b> <span id="de">de 10</span> · errores <b id="errores">0</b></div>
+  <div class="contador"><span id="pref">Dirección</span> <b id="cual">1</b> <span id="de">de 120</span> · errores <b id="errores">0</b></div>
 </div>
 
 <div class="hud">
@@ -174,7 +163,7 @@ kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-r
   <div class="chip" id="chRacha"><b id="cRacha">0</b><span class="u">racha</span></div>
   <div class="chip"><b id="cReloj">0:00</b><span class="u" id="uReloj">tiempo</span></div>
   <div class="flex"></div>
-  <button id="btnOcultar">Ocultar texto</button>
+  <button id="btnOcultar">Ocultar dirección</button>
   <button id="btnTeclado">Ocultar teclado</button>
   <button id="btnPantalla">Pantalla completa</button>
   <button id="btnReiniciar">Reiniciar</button>
@@ -183,7 +172,7 @@ kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-r
 <div class="progreso"><i id="barra"></i></div>
 
 <div class="escena">
-  <div class="caption" id="caption">Escribe la frase con acentos y mayúsculas</div>
+  <div class="caption" id="caption">Escribe la dirección de internet, desde https://</div>
   <div class="direccion" id="linea"></div>
   <div class="marcador" id="marcador"></div>
 </div>
@@ -193,13 +182,13 @@ kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-r
 </div>
 
 <div class="pie">
-  <button class="primario" id="btnOtra">Otro texto</button>
+  <button class="primario" id="btnOtra">Otra dirección</button>
   <button id="btnReloj">⏱ Contrarreloj: 60 s</button>
 </div>
 
 <div class="nota">
-  El <b>PPM</b> cuenta palabras por minuto y la <b>precisión</b> es lo que escribiste bien sobre lo que intentaste ·
-  <kbd>Enter</kbd> pasa de texto · <kbd>⌫</kbd> borra
+  Todas las direcciones empiezan con <b>https://</b> · el <b>PPM</b> son palabras por minuto y la <b>precisión</b> es lo que escribiste bien sobre lo que intentaste ·
+  <kbd>Enter</kbd> pasa de dirección · <kbd>⌫</kbd> borra
 </div>
 
 <div class="resumen" id="resumen">
@@ -207,7 +196,7 @@ kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-r
     <h2 id="rTit">¡Ronda completada!</h2>
     <p class="sub" id="rSub">Así te fue en esta ronda</p>
     <div class="grilla">
-      <div class="dato"><b id="rTextos">0</b><span>textos</span></div>
+      <div class="dato"><b id="rTextos">0</b><span>direcciones</span></div>
       <div class="dato"><b id="rErr">0</b><span>errores</span></div>
       <div class="dato"><b id="rPrec">100%</b><span>precisión</span></div>
       <div class="dato"><b id="rRacha">0</b><span>racha máx</span></div>
@@ -227,64 +216,84 @@ kbd{background:#EDE9FB;border:1px solid #D7CFF3;border-bottom-width:3px;border-r
 const $ = id => document.getElementById(id);
 
 /* ==========================================================
-   1. Textos — 3 niveles de dificultad creciente
+   1. Direcciones — como en 4to pero con dificultad mayor
+   (cortas / largas / con caracteres y sin caracteres)
    ========================================================== */
-const FRASES = [
-  "El equipo de robótica ganó la competencia estatal.",
-  "Mi abuela guarda recetas antiguas en un cuaderno.",
-  "Mañana visitaremos el museo de historia de la ciudad.",
-  "La maestra explicó la lección con paciencia y ejemplos.",
-  "Nuestro grupo plantó árboles en el patio de la escuela.",
-  "Después del recreo volvimos a la biblioteca a leer.",
-  "El tren salió puntual hacia la costa de Veracruz.",
-  "Preparé un dibujo para la feria de ciencias del aula.",
-  "Los voluntarios limpiaron el parque el sábado temprano.",
-  "En la clase de español leímos un cuento muy gracioso.",
-  "Mi perro se llama Tonto y duerme debajo de la mesa.",
-  "Aprendí a sumar fracciones con la ayuda de mis amigos."
+const DOMINIOS = [
+  "gob.mx","colegio.edu.mx","escuela.edu.mx","aula.edu.mx","biblioteca.mx",
+  "museo.com.mx","cultura.gob.mx","salud.gob.mx","banco.mx","tienda.mx",
+  "noticias.mx","deportes.mx","unam.mx","cecyt.mx","videos.com.mx",
+  "ejemplo.mx","jardin.mx","tareas.edu.mx","radio.com.mx","mapas.gob.mx"
 ];
-
-const SIGNOS = [
-  "La biblioteca abre de 8:00 a 18:30, de lunes a viernes.",
-  "Descuento del 15 % en cuadernos del 12 al 18 de marzo.",
-  "Escribe 20 líneas y sube el archivo a aula.edu.mx/2026.",
-  "¿Cuántas páginas tiene el libro? Tiene 248, son muchas.",
-  "El promedio del grupo fue 8.7; falta la tarea del viernes.",
-  "Teléfono: 55-1234-5678 (solo de 9:00 a 14:00).",
-  "Respuesta: 45 + 37 = 82, ¿la verificaste con la calculadora?",
-  "El archivo pesa 1.5 MB y se llama 'tarea-6to.txt'.",
-  "Lee el texto de la página 119 y contesta 5 preguntas.",
-  "¿Ya entregaste el reporte? Vence el viernes a las 12:00.",
-  "El 40 % del grupo eligió pintura; el 60 % eligió música.",
-  "Guarda tu trabajo con Ctrl + S antes de cerrar la ventana."
+const DOMINIOS_LATIN = [
+  "méxico.gob.mx","españa.es","música.com.mx","ángeles.edu.mx","límites.com.mx",
+  "peña.travel","cañón.com.mx","ñandú.com.ar","año.es","río.mx","señal.com",
+  "jardín.mx","niños.edu.mx","español.com.mx","árboles.org","oído.mx"
 ];
-
-const PARRAFOS = [
-  "En la feria de ciencias medimos la temperatura cada hora durante tres días. El aula más caliente fue la del tercer piso.",
-  "La maestra pidió que investigáramos el origen de las palabras. Usamos el diccionario y escribimos diez definiciones.",
-  "El pasado sábado limpiamos el río con otros grupos. Recogimos catorce costales y aprendimos a separar la basura.",
-  "Nuestro equipo de básquet perdió el primer partido, pero en el siguiente ganó por veinte puntos. Nunca nos rendimos.",
-  "Para la muestra de danza ensayamos todos los días después de clase. La coreografía duró tres minutos y salió muy bien.",
-  "En la biblioteca encontramos un mapa antiguo de la ciudad. Las calles se llamaban distinto y el río cruzaba el centro."
+const RUTAS_CORTA = [
+  "","/2026","/ayuda","/mapa","/noticias","/aulas","/deportes",
+  "/contacto","/buscar","/login","/agenda","/precios","/tours","/guia"
 ];
-
-const NIVELES = [
-  { cuantos:10, lista:FRASES,    cls:"",         pie:"Escribe la frase con acentos y mayúsculas" },
-  { cuantos:10, lista:SIGNOS,    cls:"larga",    pie:"Escribe el texto con números y signos" },
-  { cuantos:6,  lista:PARRAFOS,  cls:"parrafo",  pie:"Escribe el párrafo completo, sin saltarte renglones" }
+const RUTAS_LARGA = [
+  "/Documentos/2026/Informe-Final","/Primaria/Grado-6/Seccion-B",
+  "/Noticias/2026/Noviembre","/Portal/Estudiantes/Mis-Materias",
+  "/Biblioteca/Libros/Prestamos-2026","/Archivo/Fotos/Graduacion-2025",
+  "/Sistema/Reportes/Diciembre-2026","/Aulas/Virtual/Clase-6-B/Lista",
+  "/Escuela/Calificaciones/Primer-Parcial","/Horarios/Matutino/Vigentes",
+  "/Museo/Coleccion/Sala-De-Arte","/Ciudad/Transporte/Rutas-De-Hoy"
+];
+const RUTAS_LAT_CORTA = [
+  "/año/2026","/niños/primaria","/cañón/turismo","/música/español",
+  "/día-del-maestro","/miércoles/curso","/jardín/plantas","/árbol/navidad",
+  "/niño/libros","/sección/aula-b","/español/lección","/ratón/red"
+];
+const RUTAS_LAT_LARGA = [
+  "/Álvaro-Obregón/2026/Comercios","/año-escolar/primaria/grado-6/sección-b",
+  "/niños/lectura/comprensión/nivel-2","/música/coros/guía-de-canciones",
+  "/día-del-maestro/actos-oficiales","/cañón/rutas/buses-precios-2026",
+  "/jardín/plantas/nativas/descripción","/español/ortografía/acentuación",
+  "/miércoles/taller/pintura-para-niños","/árbol/genéalogico/familia-histórica"
 ];
 
 const azar = n => Math.floor(Math.random() * n);
 
-function construirRonda(){
-  const N = NIVELES[nivel];
-  const todas = N.lista.slice();
-  for (let i = todas.length - 1; i > 0; i--){
-    const j = azar(i + 1);
-    const t = todas[i]; todas[i] = todas[j]; todas[j] = t;
-  }
-  return todas.slice(0, N.cuantos);
+function elegir(pool, ok){
+  const f = pool.filter(ok);
+  return (f.length ? f : pool)[azar(f.length ? f.length : pool.length)];
 }
+
+/*  armada la URL: largo = rutas profundas · profundo = exigir longitud  */
+function armarURL(latin, largo, profundo){
+  const dom = (latin ? DOMINIOS_LATIN : DOMINIOS)[azar((latin ? DOMINIOS_LATIN : DOMINIOS).length)];
+  const pre = largo && (profundo || Math.random() < 0.5) ? "www." : "";
+  const base = "https://" + pre + dom;
+  const rutas = latin ? (largo ? RUTAS_LAT_LARGA : RUTAS_LAT_CORTA)
+                      : (largo ? RUTAS_LARGA : RUTAS_CORTA);
+  const n = r => base.length + r.length;
+  if (!largo) return base + elegir(rutas, r => n(r) <= 34);
+  const min = profundo ? 46 : 36;
+  return base + elegir(rutas, r => n(r) >= min && n(r) <= 70);
+}
+
+/*  120 direcciones de fácil a difícil (como en 4to)  */
+const RONDA = 120;
+
+function dirPara(i){
+  const p = RONDA > 1 ? Math.min(1, i / (RONDA - 1)) : 0;
+  const largo = p >= 0.25;          /* primeras 30: cortas y sencillas */
+  const profundo = p >= 0.6;        /* luego rutas profundas con www. */
+  const latin = Math.random() < p;  /* acentos y ñ: 0 % al principio → 100 % */
+  return armarURL(latin, largo, profundo);
+}
+
+function construirRonda(desde = 0){
+  const todas = [];
+  for (let i = 0; i < RONDA; i++) todas.push(dirPara(desde + i));
+  return todas;
+}
+
+/* la clase de tamaño depende de la longitud real de la dirección */
+const claseDe = t => t.length > 38 ? "larga" : "";
 
 /* ==========================================================
    2. Teclado físico: Windows o Mac, layout latino
@@ -444,7 +453,6 @@ function marcarSiguiente(){
 /* ==========================================================
    3. Motor de tecleo + estadística
    ========================================================== */
-let nivel = 0;
 let modo = "textos";            /* "textos" = ronda fija · "reloj" = 60 s */
 const SEG_RELOJ = 60;
 
@@ -523,11 +531,11 @@ function pintar(){
   cont.appendChild(frag);
 
   if (modo === "textos"){
-    $("pref").textContent = "Texto";
+    $("pref").textContent = "Dirección";
     $("cual").textContent = indice + 1;
     $("de").textContent = "de " + cola.length;
   } else {
-    $("pref").textContent = "Completados";
+    $("pref").textContent = "Completadas";
     $("cual").textContent = hechos;
     $("de").textContent = "";
   }
@@ -557,8 +565,7 @@ function mostrar(){
   pos = 0;
   bloqueado = false;
   acentoPendiente = null;
-  $("linea").className = "direccion " + NIVELES[nivel].cls;
-  $("caption").textContent = NIVELES[nivel].pie;
+  $("linea").className = "direccion " + claseDe(actual);
   pintar();
   hud();
 }
@@ -580,7 +587,7 @@ function siguienteTexto(){
      en modo "reloj" se vuelven a barajar para seguir sin acabarse la lista */
   if (modo === "textos" && indice + 1 >= cola.length){ terminarRonda(); return; }
   indice++;
-  if (indice >= cola.length){ cola = construirRonda(); indice = 0; }
+  if (indice >= cola.length){ cola = construirRonda(hechos); indice = 0; }
   mostrar();
 }
 
@@ -609,8 +616,7 @@ function terminarRonda(){
   const ms = t0 ? Date.now() - t0 : 0;
   const total = ok + errs;
   $("rTit").textContent = modo === "reloj" ? "¡Se acabó el tiempo!" : "¡Ronda completada!";
-  $("rSub").textContent = NIVELES[nivel].cls === "parrafo" ? "Nivel: párrafos"
-    : (NIVELES[nivel].cls === "larga" ? "Nivel: con signos" : "Nivel: frases");
+  $("rSub").textContent = "120 direcciones, de fácil a difícil";
   $("rTextos").textContent = hechos;
   $("rErr").textContent = errs;
   $("rPrec").textContent = (total ? Math.round(ok / total * 100) : 100) + "%";
@@ -736,22 +742,15 @@ $("btnReiniciar").addEventListener("click", reiniciar);
 $("rOtra").addEventListener("click", reiniciar);
 $("rCerrar").addEventListener("click", () => $("resumen").classList.remove("on"));
 
-document.querySelectorAll(".niv").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll(".niv").forEach(x => x.classList.remove("on"));
-  b.classList.add("on");
-  nivel = Number(b.dataset.n);
-  reiniciar();
-}));
-
 $("btnReloj").addEventListener("click", () => {
   modo = modo === "textos" ? "reloj" : "textos";
-  $("btnReloj").textContent = modo === "textos" ? "⏱ Contrarreloj: 60 s" : "✔ Modo: por textos";
+  $("btnReloj").textContent = modo === "textos" ? "⏱ Contrarreloj: 60 s" : "✔ Modo: por direcciones";
   reiniciar();
 });
 
 $("btnOcultar").addEventListener("click", () => {
   document.body.classList.toggle("sin-ver");
-  $("btnOcultar").textContent = document.body.classList.contains("sin-ver") ? "Ver texto" : "Ocultar texto";
+  $("btnOcultar").textContent = document.body.classList.contains("sin-ver") ? "Ver dirección" : "Ocultar dirección";
 });
 $("btnTeclado").addEventListener("click", () => {
   const oculto = elTeclado.classList.toggle("oculto");
